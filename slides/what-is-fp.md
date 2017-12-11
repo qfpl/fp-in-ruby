@@ -25,9 +25,56 @@ It's programming with functions
 <div style="float: left; width: 10%">&nbsp;</div>
 
 <div style="float: left; width: 60%; padding-top: 10%">
-<ul>
-  <li>Referentially transparent</li>
-  <li>Mapping of inputs to outputs with no side effects</li>
-</ul>
+Mapping of inputs to outputs
 </div>
 
+##
+
+ - Referential transparency
+ - Immutability
+ - Types
+
+## Referential transparency
+
+> Replacing any call to a function with the function's return value results in a program with
+> identical behavior.
+
+##
+
+```ruby
+def order(items, credit_card)
+  total_cost = 0
+  for i in items
+    total_cost += item.quantity * item.unit_price
+  end
+
+  charge(credit_card)
+  Order.new(items, total_cost)
+end
+```
+
+<div class="notes">
+- This is _not_ referentially transparent
+- Want to ensure you don't create an order without it getting paid for
+- Problem is that it's harder to reason about - never sure what code might be doing
+</div>
+
+##
+
+```ruby
+def order(items, credit_card)
+  total_cost = 0
+  for i in items
+    total_cost += item.quantity * item.unit_price
+  end
+
+  Order.new(items, total_cost)
+end
+```
+
+
+<div class="notes">
+- This _is_ referentially transparent
+- Anywhere I see a call to `order`, I can replace it with the resulting `Order`
+  and my program behaves exactly the same
+</div>
