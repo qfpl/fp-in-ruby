@@ -1,0 +1,44 @@
+#haskell-logo {
+    padding: 1%;
+}
+
+#plus-between-logos {
+    font-size: 150%;
+    width: 24%;
+    margin-top: 10%;
+}
+
+#sqlite-logo-wrapper {
+    margin-top: 4%;
+}
+
+#logos {
+    vertical-align: middle;
+    overflow: hidden;
+}
+
+#logos div {
+    float: left;
+}
+
+#haskell-logo-wrapper {
+    text-align: right;
+}
+
+#haskell-logo-wrapper,
+#sqlite-logo-wrapper {
+    width: 38%;
+    line-height: 0;
+}
+
+.reveal section img.logo {
+    background: white;
+}
+
+.reveal section img {
+    border: none;
+}
+
+blockquote {
+    text-align: left;
+}
