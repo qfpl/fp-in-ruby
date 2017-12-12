@@ -31,13 +31,50 @@ Mapping of inputs to outputs
 ##
 
  - Referential transparency
- - Immutability
  - Types
 
 ## Referential transparency
 
 > Replacing any call to a function with the function's return value results in a program with
 > identical behavior.
+
+##
+
+```ruby
+def add(a, b)
+  a + b
+end
+
+def lyf
+  2 * add(18, 3)
+end
+```
+
+##
+
+```ruby
+def add(a, b)
+  a + b
+end
+
+def lyf
+  2 * 21
+end
+```
+
+##
+
+```ruby
+def add(a, b)
+  # HERE BE EFFECTS!
+  puts "Adding #{a} and #{b}"
+  a + b
+end
+
+def lyf
+  2 * add(18, 3)
+end
+```
 
 ##
 
