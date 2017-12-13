@@ -1,11 +1,11 @@
+MOVES = [:naught, :cross]
+BOARD_SIZE = 3
 MAGIC_SUM = 15
 MAGIC_SQUARE = [8,1,6,3,5,7,4,9,2]
 SYMBOLS = [:naught, :cross]
-CELLS = BOARD_SIZE ** 2
-MAGIC_SUM = 15
 
 def new_board
-  (1..CELLS).inject([]) do |arr|
+  (1..BOARD_SIZE**2).inject([]) do |arr|
     arr + [:empty]
   end
 end
@@ -75,16 +75,23 @@ def won(board)
   winning_pair.nil? ? nil : winning_pair.first
 end
 
-def test
-  b = new_board
-  b2 = test_move(b, :naught, 1)
-  b3 = test_move(b2, :naught, 2)
-  b4 = test_move(b3, :naught, 3)
-end
-
 def test_move(b, m, p)
   new_b = move(b, m, p)
   puts draw_board(new_b)
   puts won(new_b)
   new_b
 end
+
+def wait
+  gets
+  puts `clear`
+end
+
+b = new_board
+b2 = test_move(b, :naught, 1)
+wait
+b3 = test_move(b2, :naught, 2)
+wait
+b4 = test_move(b3, :naught, 3)
+wait
+
