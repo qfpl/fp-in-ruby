@@ -108,7 +108,6 @@ def order(items, credit_card)
     total_cost += item.quantity * item.unit_price
   end
 
-  # Create a charge object that we can use to charge the card later
   charge = Charge.new(credit_card, total_cost)
   Order.new(items, total_cost, charge)
 end
@@ -123,6 +122,45 @@ end
   fire data structures at the method
 </div>
 
-## Why is referential transparency desirable?
+##
+
+Why is referential transparency desirable?
 
 ##
+
+- Easy to reason about
+- Easy to test
+- Fearless code changes
+
+<div class="notes">
+- Each function/method is entirely self contained
+  + Never have to worry about state of the system
+  + Who's pretended to be an interpreter and maintained state in their head to understand code?
+</div>
+
+##
+
+What are the implications of referential transparency?
+
+##
+
+No observable side effects
+
+- No writes to the database
+- No printing to the console
+- No mutable state
+
+<div class="notes">
+- Some people might think I'm crazy
+- People write software this way to do everything you do in Ruby
+</div>
+
+## Homework
+
+
+
+## {data-background-image="images/one-weird-trick.jpg"}
+
+##
+
+
