@@ -85,15 +85,18 @@ def order(items, credit_card)
     total_cost += item.quantity * item.unit_price
   end
 
-  charge(credit_card)
+  # Actually charges the card
+  charge(credit_card, total_cost)
   Order.new(items, total_cost)
 end
 ```
 
 <div class="notes">
-- This is _not_ referentially transparent
+- Let's look at a less trivial example
 - Want to ensure you don't create an order without it getting paid for
-- Problem is that it's harder to reason about - never sure what code might be doing
+- I can't get an order without charging a card - coupling
+- More importantly, I can't replace the call to `order` with the returned `Order` and
+  have my software work the same way
 </div>
 
 ##
@@ -105,13 +108,21 @@ def order(items, credit_card)
     total_cost += item.quantity * item.unit_price
   end
 
-  Order.new(items, total_cost)
+  # Create a charge object that we can use to charge the card later
+  charge = Charge.new(credit_card, total_cost)
+  Order.new(items, total_cost, charge)
 end
 ```
-
 
 <div class="notes">
 - This _is_ referentially transparent
 - Anywhere I see a call to `order`, I can replace it with the resulting `Order`
   and my program behaves exactly the same
+- Idea that you can turn your effects into data and run them explicitly
+- Furthermore, the code that runs effects can be tested more easily now - just
+  fire data structures at the method
 </div>
+
+## Why is referential transparency desirable?
+
+##
