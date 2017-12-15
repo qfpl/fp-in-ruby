@@ -1,7 +1,5 @@
 #!/usr/bin/env ruby
 
-$VERBOSE = true
-
 BOARD_SIZE = 3
 CELLS = BOARD_SIZE ** 2
 MAGIC_SUM = 15
@@ -82,7 +80,7 @@ def draw_symbol(s)
   when :naught
     'o'
   else
-    "INVALID SYMBOL #{s.to_s}"
+    raise "Asked to draw invalid symbol #{s.to_s}. This wouldn't happen if we had real sum types"
   end
 end
 
