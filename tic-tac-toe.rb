@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
-MOVES = [:naught, :cross]
+$VERBOSE = true
+
 BOARD_SIZE = 3
 CELLS = BOARD_SIZE ** 2
 MAGIC_SUM = 15
@@ -10,7 +11,7 @@ SYMBOLS = [:naught, :cross]
 Game = Struct.new(:board, :next_symbol, :winner)
 
 def start(first_player)
-  return nil if !MOVES.include?(first_player)
+  return nil if !SYMBOLS.include?(first_player)
   Game.new(new_board, first_player, nil)
 end
 
@@ -37,13 +38,15 @@ def move(game, position)
   index = position - 1
   target = game.board[index]
 
-  if target.nil? || target != :empty
-    self
+  if target.nil?
+    [game, "Move out of bounds: #{position}"]
+  elsif target != :empty
+    [game, "Position #{position} is already occupied"]
   else
     new_board = game.board.clone
     new_board[index] = game.next_symbol
     new_symbol = game.next_symbol == :naught ? :cross : :naught
-    Game.new(new_board, new_symbol, winner(new_board))
+    [Game.new(new_board, new_symbol, winner(new_board)), ""]
   end
 end
 
@@ -53,6 +56,8 @@ def draw(board)
 end
 
 def winner(board)
+  # If we think of the board as a magic square, if any 3 squares held by the one player
+  # sum to the value of the magic square, they have row, column, or diagonal.
   winning_pair =
     board.zip(MAGIC_SQUARE).
           select { |(s,m)| SYMBOLS.include?(s) }.
@@ -86,6 +91,9 @@ def rows(board)
 end
 
 def intercalate(l, e)
+  # This uses mutation, but only on a value created within the function, hence
+  # it is not observable outside the function and therefore maintains referential
+  # transparency.
   l.inject([]) { |a, x| a << x << e }[0..-2]
 end
 
@@ -97,21 +105,27 @@ puts `clear`
 puts "Let's play!"
 gets
 puts `clear`
-game = start(MOVES.sample)
+game = start(SYMBOLS.sample)
+error = ""
 until finished?(game)
+  puts `clear`
+  puts error
+  puts
   puts draw(game.board)
   puts
   puts "It's #{game.next_symbol}'s move."
   puts "move (1-9): "
   move = gets.chomp
-  puts `clear`
-  if move =~ /[1-9]/
-    game = move(game, move.to_i)
+  if move =~ /^[1-9]$/
+    (game, error) = move(game, move.to_i)
   else
-    puts "'#{move}' is not a valid move. Try 1-9."
+    error = "'#{move}' is not a valid move. Try 1-9."
   end
 end
 
+puts `clear`
+puts
+puts
 puts draw(game.board)
 puts
 puts "Game over!"
