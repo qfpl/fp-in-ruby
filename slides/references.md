@@ -9,3 +9,4 @@
 
 - Hexagonal architecture: http://alistair.cockburn.us/Hexagonal+architecture
 - Boundaries talk by Gary Bernhardt: https://www.youtube.com/watch?v=yTkzNHF6rMs
+- `&:` explanation: https://stackoverflow.com/a/1961118/510722
