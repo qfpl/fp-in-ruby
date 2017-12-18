@@ -140,11 +140,8 @@ Why is referential transparency desirable?
 
 ##
 
-What are the implications of referential transparency?
-
-##
-
-No observable side effects
+The major implication of referential transparency is that expressions cannot have any
+observable side effects.
 
 - No writes to the database
 - No printing to the console
@@ -155,12 +152,128 @@ No observable side effects
 - People write software this way to do everything you do in Ruby
 </div>
 
-## Homework
-
-
-
-## {data-background-image="images/one-weird-trick.jpg"}
+## {data-background-image="images/one-weird-trick.jpg" data-background-size="contain"}
 
 ##
 
+Our programs don't execute side effects, they produce computations as pure
+values that are executed by a runtime system.
+
+##
+
+```haskell
+main :: IO ()
+```
+
+<div class="notes">
+- `main` is the entrypoint to a Haskell program, similar to C
+- It always has type `IO ()`
+- This means it returns a computation that performs some IO and yields no value
+- The computation is a value that Haskell's runtime system can execute
+</div>
+
+##
+
+```ruby
+def main(num_echoes)
+  <<-MAIN
+  loop do
+    s = $stdin.gets
+    break if s.chomp == 'quit'
+    puts(s * #{num_echoes})
+  end
+  MAIN
+end
+
+# Pretend runtime system
+eval(main(ARGV[0]))
+```
+
+<div class="notes">
+- This is very roughly analogous to what Haskell does
+- We have a pure function that returns a computation (`String`), and the runtime system executes it
+</div>
+
+##
+
+What are the downsides of referential transparency?
+
+##
+
+- Some algorithms may require mutation to achieve highest performance
+- Hard to achieve in languages where it's not the default
+
+## Types
+
+##
+
+<img src="images/function.png" width="60%" />
+
+<div class="notes">
+- Notice that our function is defined as being between two sets
+- X is a set of coloured shapes, and Y is a set of colours
+- This function isn't defined for any inputs that aren't coloured shapes - that is, elements of X
+- types categorises values in the same way that set membership does
+</div>
+
+##
+
+Why are types desirable?
+
+##
+
+- Allow you to more precisely represent the intentions of the programmer
+- Catches many errors before runtime
+- Obviates need for many tests
+- Support you in writing complex code
+
+<div class="notes">
+- restricted types with few inhabitants make code easier to reason about
+  + if my input must be one of three things, it's much easier to reason about than one that takes infinity
+- to achieve the same level of robustness in a unityped language you must write a lot of boiler-plate
+  defense code to ensure inputs are valid
+  + tests might help, but software changes, requirements change, and it's easy to miss things
+</div>
+
+##
+
+Not your parents' type system!
+
+##
+
+ - Robust and widespread inference
+ - Powerful and concise declarations
+   + Algebraic data types (sums and products)
+
+<div class="notes">
+- It's likely you haven't seen the sort of type system I'm talking about
+- Conventional languages - Java, C#, C++ - have comparitively simple and clunky type systems
+</div>
+
+##
+
+Why are types _not_ desirable?
+
+##
+
+- When they're not expressive enough
+- When tool support is lacking
+
+<div class="notes">
+- In theory there's a tradeoff, although personally I would always prefer a type system
+</div>
+
+## Functions are values
+
+##
+
+Functions are values, just like strings and numbers, that can be passed to other functions as arguments.
+
+<div class="notes">
+- lambdas/procs/blocks in Ruby
+</div>
+
+##
+
+A function that takes a function as input, or returns a function, is a _higher-order_ function.
 

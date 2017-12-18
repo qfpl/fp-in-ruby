@@ -1,4 +1,6 @@
-## Image credits
+# Credits
+
+## Images
 
 - Monad shirt: http://lessons.codemiller.com/#/2/2
 - From the government: https://imgflip.com/i/9n828
