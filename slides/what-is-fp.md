@@ -28,10 +28,26 @@ It's programming with functions
 Mapping of inputs to outputs
 </div>
 
+<div class="notes">
+- Only one output per input
+- Directional
+</div>
+
 ##
 
- - Referential transparency
+ - Purity / referential transparency
  - Types
+ 
+## Purity
+
+- No observable side effects
+- No free variables
+
+<div class="notes">
+- Free variables are variables that are not local to the function
+   + Not a paramater
+   + Not created within scope of the function
+</div>
 
 ## Referential transparency
 
@@ -67,14 +83,20 @@ end
 ```ruby
 def add(a, b)
   # HERE BE EFFECTS!
-  puts "Adding #{a} and #{b}"
-  a + b
+  puts "Adding #{a} and #{b} and #{@c}"
+  a + b + @c
 end
 
 def lyf
   2 * add(18, 3)
 end
 ```
+
+<div class="notes">
+- `add` is impure because it references an instance variable and prints
+- `add` isn't referentially transparent because its return value may change without inputs changing
+   + instance variable could change
+</div>
 
 ##
 
