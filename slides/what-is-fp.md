@@ -150,7 +150,7 @@ Why is referential transparency desirable?
 
 ##
 
-- Easy to reason about
+- Easy to reason about code
 - Easy to test
 - Fearless code changes
 
@@ -158,12 +158,15 @@ Why is referential transparency desirable?
 - Each function/method is entirely self contained
   + Never have to worry about state of the system
   + Who's pretended to be an interpreter and maintained state in their head to understand code?
+- Testing doesn't require mocks/stubs. Pass arguments to a function and compare the results
+  + At some point you want to test the whole system, but almost all code should be pure and rt
 </div>
 
 ##
 
-The major implication of referential transparency is that expressions cannot have any
-observable side effects.
+What am I giving up with referential transparency?
+
+##
 
 - No writes to the database
 - No printing to the console
@@ -190,7 +193,7 @@ main :: IO ()
 <div class="notes">
 - `main` is the entrypoint to a Haskell program, similar to C
 - It always has type `IO ()`
-- This means it returns a computation that performs some IO and yields no value
+- This means it returns a computation (value!) that performs some IO (side effects) and yields no value
 - The computation is a value that Haskell's runtime system can execute
 </div>
 
@@ -234,8 +237,8 @@ What are the downsides of referential transparency?
 <div class="notes">
 - Notice that our function is defined as being between two sets
 - X is a set of coloured shapes, and Y is a set of colours
-- This function isn't defined for any inputs that aren't coloured shapes - that is, elements of X
 - types categorises values in the same way that set membership does
+- Only defined for inputs in X - no need to worry about other inputs
 </div>
 
 ##
@@ -246,30 +249,15 @@ Why are types desirable?
 
 - Allow you to more precisely represent the intentions of the programmer
 - Catches many errors before runtime
-- Obviates need for many tests
+- Eliminates need for many tests
 - Support you in writing complex code
 
 <div class="notes">
 - restricted types with few inhabitants make code easier to reason about
-  + if my input must be one of three things, it's much easier to reason about than one that takes infinity
-- to achieve the same level of robustness in a unityped language you must write a lot of boiler-plate
-  defense code to ensure inputs are valid
-  + tests might help, but software changes, requirements change, and it's easy to miss things
-</div>
-
-##
-
-Not your parents' type system!
-
-##
-
- - Robust and widespread inference
- - Powerful and concise declarations
-   + Algebraic data types (sums and products)
-
-<div class="notes">
-- It's likely you haven't seen the sort of type system I'm talking about
-- Conventional languages - Java, C#, C++ - have comparitively simple and clunky type systems
+  + 3 possible inputs vs infinity
+- achieving the same robustness requires a lot of boilerplate in unityped langs
+- compiler error at function call site, vs testing a method handles type errors
+- can make changes and then follow the compiler errors - no misses
 </div>
 
 ##
@@ -285,17 +273,44 @@ Why are types _not_ desirable?
 - In theory there's a tradeoff, although personally I would always prefer a type system
 </div>
 
-## Functions are values
-
 ##
 
-Functions are values, just like strings and numbers, that can be passed to other functions as arguments.
+"I've used language X and the types got in the way more than they helped"
 
 <div class="notes">
-- lambdas/procs/blocks in Ruby
+- I felt this way too after using conventional, typed, OO languages
+- Much better tools exist
+   + Haskell
+   + Idris
+   + Agda
+- Encourage you to try these if you have this opinion
 </div>
 
 ##
 
-A function that takes a function as input, or returns a function, is a _higher-order_ function.
+ - Robust and widespread inference
+ - Algebraic data types (sums and products)
+
+<div class="notes">
+- many Ruby expressions are valid Haskell programs thanks to inference
+- Powerful and concise declarations
+</div>
+
+## Functions are values
+
+<div class="notes">
+- Another property of FP not implied by our definition
+</div>
+
+##
+
+Functions are values, just like strings and numbers, that can be passed to other functions as arguments or returned by functions.
+
+<div class="notes">
+- lambdas/procs/blocks in Ruby
+- functions that take/return functions are _higher order_
+</div>
+
+##
+
 
