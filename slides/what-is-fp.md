@@ -12,7 +12,6 @@
 It's programming with functions
 
 <div class="notes">
-- Right now everyone's thinking "great, another condescending Haskell programmer"
 - This isn't helpful without a clear definition of what I meant by function
 </div>
 
@@ -48,6 +47,15 @@ Mapping of inputs to outputs
    + Not a paramater
    + Not created within scope of the function
 </div>
+
+##
+
+```ruby
+def foo(a)
+  b = a ** 2
+  (a + b) * @factor
+end
+```
 
 ## Referential transparency
 
@@ -96,6 +104,7 @@ end
 - `add` is impure because it references an instance variable and prints
 - `add` isn't referentially transparent because its return value may change without inputs changing
    + instance variable could change
+- `add` has side effects - output not printed if replace call
 </div>
 
 ##
@@ -104,7 +113,7 @@ end
 def order(items, credit_card)
   total_cost = 0
   for i in items
-    total_cost += item.quantity * item.unit_price
+    total_cost += i.quantity * i.unit_price
   end
 
   # Actually charges the card
@@ -127,7 +136,7 @@ end
 def order(items, credit_card)
   total_cost = 0
   for i in items
-    total_cost += item.quantity * item.unit_price
+    total_cost += i.quantity * i.unit_price
   end
 
   charge = Charge.new(credit_card, total_cost)
@@ -143,6 +152,19 @@ end
 - Furthermore, the code that runs effects can be tested more easily now - just
   fire data structures at the method
 </div>
+
+##
+
+```ruby
+def order(items, credit_card)
+  total_cost = items.inject(0) do |s, i|
+    s + i.quantity * i.unit_price
+  end
+
+  charge = Charge.new(credit_card, total_cost)
+  Order.new(items, total_cost, charge)
+end
+```
 
 ##
 
@@ -310,7 +332,5 @@ Functions are values, just like strings and numbers, that can be passed to other
 - lambdas/procs/blocks in Ruby
 - functions that take/return functions are _higher order_
 </div>
-
-##
 
 
