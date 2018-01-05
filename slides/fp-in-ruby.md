@@ -139,10 +139,10 @@ up_things = things.map { |s| s.upcase }
 
 Avoid `each` and `for` loops - they suggest side effects. Instead use functions like:
 
+ - `select`
  - `map`
  - `inject`
  - `zip`
- - `select`
 
 <div class="notes">
 - Each of these are higher order functions in the sense that they expect a block
@@ -154,26 +154,30 @@ Avoid `each` and `for` loops - they suggest side effects. Instead use functions 
 ### `select`
 
 ```ruby
+# Bad
 nums = []
 (1..10).each { |n| nums << n if n.even? }
-```
 
-##
-
-```ruby
+# Good
 nums = (1..10).select { |n| n.even? }
+
+# => [2,4,6,8,10]
 ```
 
 ##
 
 ### `map`
 
-##
-
 ```ruby
+# Bad
 nums = [1,2,3]
 squares = []
 nums.each { |n| squares << n ** 2 }
+
+# Good
+squares = nums.map { |n| n ** 2 }
+
+# => [1,4,9]
 ```
 
 <div class="notes">
@@ -184,35 +188,46 @@ nums.each { |n| squares << n ** 2 }
 
 ##
 
+### `inject`
+
 ```ruby
+# Bad
 nums = [1,2,3]
-squares = nums.map { |n| n ** 2 }
+total = 0
+nums.each { |n| total += n }
+
+# Good
+nums.inject(0) { |sum, n| sum + n }
+
+# Best
+nums.inject(0, &:+)
 ```
 
 ##
 
-### `inject`
+```ruby
+[1,2,3].inject(0, &:+)
+```
+
+Ruby vs Haskell
+
+```haskell
+foldr (+) 0 [1,2,3]
+```
 
 ##
 
 ```ruby
-array.inject(initial_accumulator) do |accumulator, element|
-  ...
-  new_accumulator
-end
-``
-
-<div class="notes">
-- Important to note that `inject` returns the last accumulator value returned from the block
-- This is better known as `fold` or `reduce`
-</div>
-
-##
-
-```ruby
+# this...
 nums = [1,2,3]
 nums_to_squares = {}
 nums.each { |n| nums_to_squares[n] = n ** 2 }
+
+# ...or this
+nums_to_squares = nums.inject({}) do |h, n|
+  h[n] = n ** 2
+  h
+end
 ```
 
 <div class="notes">
@@ -221,15 +236,13 @@ nums.each { |n| nums_to_squares[n] = n ** 2 }
 
 ##
 
-```
-nums.inject({}) do |h, n|
-  h[n] = n ** 2
-  h
-end
-```
+### `zip`
 
-<div class="notes">
-- `map` is preferable, but sometimes we want to change the structure being accumulated
-- `inject` allows us to do this as it's more general
-</div>
+```ruby
+odds = [1,3]
+evens = [2,4]
+(0..[odds.length, evens.length].min).each { |i|
+  odds[i]
+}
+```
 
