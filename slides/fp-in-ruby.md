@@ -115,7 +115,25 @@ b = map_proc(a, f)
 
 ##
 
+Avoid methods with `!` suffix.
 
+```ruby
+things = ['keyboard', 'mouse', 'display']
+
+# Unneccessary mutation
+things.map! { |s| s.upcase }
+
+# Immutability
+up_things = things.map { |s| s.upcase }
+```
+
+<div class="notes">
+- Can always replace mutation with another variable
+- Mutation is a problem because it hurts our ability to reason
+   + Must interpret the code in your head to know what a variable contains at any point
+   + With immutability, you only need to find where it's defined - can't be anything else after that
+- Tradeoff is coming up with more names for things
+</div>
 
 ##
 
