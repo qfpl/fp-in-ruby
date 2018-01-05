@@ -4,10 +4,118 @@
 - Now that I've explained some concepts and motivation - what can we achieve in Ruby
 </div>
 
+## Higher order functions
+
+##
+
+Higher order functions are essential to FP. Ruby doesn't quite support them, but we can approximate them with blocks/`Proc`.
+
+##
+
+```ruby
+def map_block(a)
+  b = []
+  for x in a
+    b << (yield x)
+  end
+
+  b
+end
+
+a = [1,2,3]
+b = map(a) { |n| n * 3 }
+# b == [3,6,9]
+```
+
+<div class="notes">
+`yield` keyword calls block
+</div>
+
+##
+
+```ruby
+def map_block(a)
+  b = []
+  for x in a
+    b << (yield x)
+  end
+
+  b
+end
+
+a = [1,2,3]
+f = Proc.new { |n| n * 3 }
+b = map(a, &f)
+# b == [3,6,9]
+```
+
+<div class="notes">
+If a method takes a block, can give it a `Proc` as its last arg and prefix with `&`
+</div>
+
+##
+
+```ruby
+def map_block_arg(a, &f)
+  b = []
+  for x in a
+    b << f.call(x)
+  end
+
+  b
+end
+
+a = [1,2,3]
+b = map(a) { |n| n * 3 }
+# b == [3,6,9]
+```
+
+<div class="notes">
+`&` turns anonymous block into a named `Proc`
+</div>
+
+##
+
+```ruby
+def map_proc(a, f)
+  b = []
+  for x in a
+    b << f.call(x)
+  end
+
+  b
+end
+
+a = [1,2,3]
+f = Proc.new { |n| n * 3 }
+b = map_proc(a, f)
+# b = [3,6,9]
+```
+
+##
+
+`Symbol#to_proc` for instance methods
+
+```ruby
+# You wrote:
+[1,2,3].map { |n| n.to_s }
+
+# Why not:
+[1,2,3].map(&:to_s)
+```
+
+- `&` prefix calls `#to_proc`
+- `#to_proc` on symbols returns a `Proc` that executes the named _instance_ method
+- `Proc` argument is taken as a block
+
 ## Referential transparency
 
 - Immutability
 - No side effects
+
+##
+
+
 
 ##
 
@@ -40,18 +148,6 @@ nums = (1..10).select { |n| n.even? }
 
 ##
 
-### Pro tip!
-
-```ruby
-nums = (1..10).select(&:even?)
-```
-
-- `:` prefix calls `#to_proc`
-- `#to_proc` on symbols returns a `Proc` that executes the named method
-- `&` in this context calls `#to_proc` and passes the result as a block
-
-##
-
 ### `map`
 
 ##
@@ -81,16 +177,16 @@ squares = nums.map { |n| n ** 2 }
 
 ##
 
-```
-Array#inject(INITIAL_VALUE) do
-  |ACCUMULATED_VALUE, NEXT_ELEMENT|
+```ruby
+array.inject(initial_accumulator) do |accumulator, element|
   ...
-  NEW_ACCUMULATOR
+  new_accumulator
 end
-```
+``
 
 <div class="notes">
 - Important to note that `inject` returns the last accumulator value returned from the block
+- This is better known as `fold` or `reduce`
 </div>
 
 ##
@@ -99,7 +195,6 @@ end
 nums = [1,2,3]
 nums_to_squares = {}
 nums.each { |n| nums_to_squares[n] = n ** 2 }
-
 ```
 
 <div class="notes">
@@ -119,45 +214,4 @@ end
 - `map` is preferable, but sometimes we want to change the structure being accumulated
 - `inject` allows us to do this as it's more general
 </div>
-
-##
-
-```ruby
-nums.inject([]) do |a, n|
-  a << n
-  a
-end
-```
-
-<div class="notes">
-- Now the accumulator is declared and modified within `inject`
-</div>
-
-##
-
-```ruby
-nums.inject([]) do |a, n|
-  a2 = a.clone
-  a2 << n ** 2
-  a
-end
-```
-
-<div class="notes">
-- We could go all the way and copy our structure, but given the expression is already
-  referentially transparent, there's no point incurring the performance hit
-</div>
-
-##
-
-## Immutability
-
-##
-
-Avoid methods with `!` suffixe
- 
-```
-
-```
-
 
