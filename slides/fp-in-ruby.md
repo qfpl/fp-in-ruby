@@ -118,13 +118,16 @@ b = map_proc(a, f)
 Avoid methods with `!` suffix.
 
 ```ruby
-things = ['keyboard', 'mouse', 'display']
-
 # Unneccessary mutation
+things = ['keyboard', 'mouse', 'display']
 things.map! { |s| s.upcase }
+# things == ['KEYBOARD', 'MOUSE', 'DISPLAY']
 
 # Immutability
-up_things = things.map { |s| s.upcase }
+things2 = ['keyboard', 'mouse', 'display']
+up_things2 = things.map { |s| s.upcase }
+# things2 == ['keyboard', 'mouse', 'display']
+# up_things == ['KEYBOARD', 'MOUSE', 'DISPLAY']
 ```
 
 <div class="notes">
@@ -241,8 +244,71 @@ end
 ```ruby
 odds = [1,3]
 evens = [2,4]
+pairs = []
 (0..[odds.length, evens.length].min).each { |i|
-  odds[i]
+  pairs << [odds[i], evens[i]]
 }
+# pairs == [[1,2], [3,4]]
+
+zip_pairs = odds.zip(evens)
+# zip_pairs == [[1,2], [3,4]]
+
 ```
+
+## `self` methods
+
+##
+
+```ruby
+class Foo
+  def self.do_the_thing
+    # can't access instance variables or methods
+  end
+end
+```
+
+## Modules
+
+```ruby
+module TicTacToe
+  Game = Struct.new(:board, :next_symbol, :winner)
+  
+  def self.finished?(game)
+    return true unless game.winner.nil?
+    return true if board_full?(game.board)
+    false
+  end
+end
+```
+
+<div class="notes">
+- Modules cannot be instantiated
+- Encapsulate data and functions, but no mutable state or inheritance
+- Just data and functions
+</div>
+
+## Types
+
+<div class="notes">
+- Ruby is unityped
+- No compiler support
+- Can't do a lot
+- Can at least make things clearer
+</div>
+
+### Simple data types
+
+```ruby
+Foo = Struct.new(:bar, :baz, :whoozitz)
+```
+
+<div class="notes">
+- Sometimes you want organised data without operations
+- Hash is obvious choice
+- hashes are open - problematic
+</div>
+
+##
+
+That's it for types
 
