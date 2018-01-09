@@ -333,4 +333,12 @@ Functions are values, just like strings and numbers, that can be passed to other
 - functions that take/return functions are _higher order_
 </div>
 
+## Abstraction
+
+<div class="notes">
+- Finally - mathematics and software both about abstraction.
+- Recognize patterns and factor them out.
+- Common language for concepts
+- _not_ about being obtuse and academic
+</div>
 
