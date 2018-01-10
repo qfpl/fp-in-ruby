@@ -4,8 +4,11 @@ import Control.Applicative (liftA3)
 import qualified Control.Monad.State as S
 import           Control.Monad (replicateM, (<=<))
 import qualified Data.Map.Strict as M
+import Data.Maybe (maybe)
+import Data.Monoid (Sum (Sum), Product (Product), (<>))
 import Text.Read (readMaybe)
 
+goodMap, badMap :: M.Map String (String, Int)
 goodMap = M.fromList [("a", ("b", 1)), ("b", ("c", 3)), ("c", ("d", 5))]
 badMap = M.fromList [("a", ("b", 1)), ("b", ("d", 3)), ("c", ("d", 5))]
 
@@ -39,12 +42,22 @@ listDepsP :: (Monad m, Monoid n) => (k -> m (k, n)) -> k -> m n
 listDepsP f s =
   let
     nextN = do
-      key <- S.get
-      (key', n) <- S.lift $ f key
-      S.put key'
+      (key, n) <- S.get >>= S.lift . f
+      S.put key
       pure n
   in
     mconcat <$> S.evalStateT (replicateM 3 nextN) s
+
+testListDepsPMaybe =
+  listDepsP (flip M.lookup (fmap Sum <$> goodMap)) "a"
+
+testListDepsPEither =
+  let
+    f k = maybe (Left $ "Couldn't find " <> k)
+                Right
+                (M.lookup k (fmap Product <$> badMap))
+  in
+    listDepsP f "a"
 
 whoozits :: Int -> Maybe Int
 whoozits n

@@ -1,4 +1,8 @@
 module Abstractions
+
+  HDEPS = {"a" => ["b", 1], "b" => ["c", 3], "c" => ["d", 5]}
+  HDEPS_BOOM = {"a" => ["b", 1], "b" => ["c", "oops"], "c" => ["d", 5]}
+
   def self.add_three_failures(h)
     a = h["a"]
     b = h["b"]
@@ -41,19 +45,51 @@ module Abstractions
     }
   end
 
-  def self.test_deps
-    hdeps = {"a" => ["b", 1], "b" => ["c", 3], "c" => ["d", 5]}
-    hdeps_boom = {"a" => ["b", 1], "b" => ["c", "oops"], "c" => ["d", 5]}
+  def self.abstract_deps(pure, mappend, mempty, f, s)
+    (1..3).inject(pure.call([s, mempty])) { |m|
+      m.bind { |(k, n)|
+        f.call(k).bind { |(next_key, next_n)|
+          pure.call([next_key, mappend.call(n, next_n)])
+        }
+      }
+    }
+  end
 
-    actual = deps(hdeps)
+  class Maybe
+    def initialize(a)
+      @a = a
+    end
+
+    def bind
+      if @a.nil?
+        nil
+      else
+        # Let's pray the block returns another maybe
+        yield @a
+      end
+    end
+  end
+
+  def self.test_abstract_deps
+    pyooah = Maybe.method(:new)
+    abstract_deps(pyooah,
+                  ->(a,b){a + b},
+                  0,
+                  ->(k){pyooah.call(HDEPS[k])},
+                  "a"
+                 )
+  end
+
+  def self.test_deps
+    actual = deps(HDEPS)
     puts "deps gives #{actual}, should be 9"
 
-    better = better_deps(hdeps)
+    better = better_deps(HDEPS)
     puts "better_deps gives #{better}, should be 9"
 
-    # actual_boom = deps(hdeps_boom)
+    # actual_boom = deps(HDEPS_BOOM)
     # puts "whatever we splode"
-    better_boom = deps(hdeps_boom)
+    better_boom = deps(HDEPS_BOOM)
   end
 
   def self.whoozits(n)
@@ -80,4 +116,5 @@ module Abstractions
       a.nil? ? nil : f.call(a)
     }
   end
+
 end
