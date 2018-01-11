@@ -20,6 +20,7 @@ Mathematics has a rich world of algebra that is hard to take advantage of withou
 ##
 
 ```haskell
+addThreeMaybes :: Map String Int -> Int
 addThreeMaybes h =
   liftA3 (\a b c -> a + b + c)
          (lookup h "foo")
@@ -35,12 +36,14 @@ Things to note:
    + `liftA3` to run the computation
    + lambda to specify what to do with each value
    + each of the values
+- side note on Haskell - the type declaration isn't necessary here
 </div>
 
 ##
 
 ```haskell
 -- List of keys can be arbitrarily long. If any aren't present, we get `Nothing`.
+addThreeMaybes :: Map String Int -> [String] -> Int
 addThreeMaybes h keys =
   fmap sum . traverse (`M.lookup` h) $ keys
 ```
@@ -94,6 +97,11 @@ end
 - Relies on hash lookups returning nil
 - Explicit `nil` handling
 </div>
+
+##
+
+```ruby
+```
 
 ##
 

@@ -20,6 +20,13 @@ module Abstractions
     end
   end
 
+  def self.add_three_failures_list(h, keys)
+    keys.inject(0) { |a, k|
+      n = h[k]
+      (a.nil? || n.nil?) ? nil : a + n
+    }
+  end
+
   def self.deps(h)
     (ka, a)  = h["a"]
     if ka && a
