@@ -1,3 +1,8 @@
+require 'monads/optional'
+require 'monads/many'
+
+include Monads
+
 module Abstractions
 
   HDEPS = {"a" => ["b", 1], "b" => ["c", 3], "c" => ["d", 5]}
@@ -47,31 +52,17 @@ module Abstractions
 
   def self.abstract_deps(pure, mappend, mempty, f, s)
     (1..3).inject(pure.call([s, mempty])) { |m|
-      m.bind { |(k, n)|
-        f.call(k).bind { |(next_key, next_n)|
+      m.and_then { |(k, n)|
+        f.call(k).and_then { |(next_key, next_n)|
           pure.call([next_key, mappend.call(n, next_n)])
         }
       }
     }
   end
 
-  class Maybe
-    def initialize(a)
-      @a = a
-    end
-
-    def bind
-      if @a.nil?
-        nil
-      else
-        # Let's pray the block returns another maybe
-        yield @a
-      end
-    end
-  end
-
   def self.test_abstract_deps
-    pyooah = Maybe.method(:new)
+    #pyooah = Optional.method(:new)
+    pyooah = ->(a){a.nil? ? Many.new([]) : Many.new([a])}
     abstract_deps(pyooah,
                   ->(a,b){a + b},
                   0,
