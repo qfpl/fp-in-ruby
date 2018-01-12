@@ -49,8 +49,7 @@ addThreeMaybes h keys =
 ```
 
 <div class="notes">
-This is scarier, but should the need arise, we can extend the above to
-an arbitrary number of inputs
+Should the need arise, we can handle an arbitrary list of keys like so
 </div>
 
 ##
@@ -101,7 +100,17 @@ end
 ##
 
 ```ruby
+def self.add_three_failures_list(h, keys)
+  keys.inject(0) { |a, k|
+    n = h[k]
+    (a.nil? || n.nil?) ? nil : a + n
+  }
+end
 ```
+
+<div class="notes">
+Similar to the haskell version, but not as nice
+</div>
 
 ##
 
@@ -122,13 +131,27 @@ addThreeValidations h keys =
                 (M.lookup k h)
   in
     fmap sum . traverse f $ keys
+    
+-- "foo" and "baz" aren't keys in the map
+addThreeValidations someMap ["foo", "bar", "baz"]
+-- => AccFailure ["Couldn't find key: foo","Couldn't find key: baz"]
 ```
+
+<div class="notes">
+Our map lookup is transformed into a type that captures
+errors and aggregates them.
+</div>
 
 ##
 
 ```haskell
 -- Maybe
-fmap sum . traverse (`M.lookup` h) $ keys
+addThreeMaybes :: 
+addThreeMaybes =
+  let
+    f = (`M.lookup` h)
+  in
+    fmap sum . traverse f $ keys
 
 -- Validation
 let
@@ -142,18 +165,59 @@ in
 ##
 
 ```haskell
--- Maybe
-let
-  f = (`M.lookup` h)
-in
-  fmap sum . traverse f $ keys
+addThings f xs =
+  fmap sum . traverse f $ xs
+  
+addMaybes h keys =
+  addThings (`M.lookup` h) keys
+  
 
--- Validation
-let
-  f k = maybe (AccFailure $ ["Couldn't find key: " <> k])
-              AccSuccess
-              (M.lookup k h)
-in
-  fmap sum . traverse f $ keys
+addValidations h keys =
+  let
+    validatedLookup k =
+      maybe (AccFailure $ ["Couldn't find key: " <> k])
+            AccSuccess
+            (M.lookup k h)
+  in
+    addThings validatedLookup keys
+  
+addMultiplesOf n ns =
+  addThings (*) ns n
 ```
+
+<div class="notes">
+- Factored repetition and separated concerns
+- Function about adding things in some computational context
+   + missing data, failure with record, computations that require an input
+</div>
+
+##
+
+At this point, trying to write `addThings` in Ruby hurt my brain.
+
+##
+
+- No types to guide me or tell me when I'm wrong
+- No existing abstractions to build on
+
+## Take away
+
+- Ruby gives you some basics
+   + Methods that don't use mutation
+   + Higher order functions via blocks/`Proc`
+- Ruby falls down with deeper abstractions
+   + Lack of types/tool suppport
+   + Fighting the design/intentions of the language
+   
+<div class="notes">
+- Using what you can will make your code better
+- You'll hit a limit fairly quickly
+   + Ability to keep everything in your head starts to break down
+   + This is where tools/types help
+- This _does_ matter. Ability to abstract further means...
+   + less repetition
+   + less bugs
+   + shared understanding and code
+   + steal from mathematicians
+</div>
 

@@ -1,14 +1,14 @@
 module Abstractions where
 
-import Control.Applicative (liftA3)
+import           Control.Applicative (liftA3)
+import           Control.Monad       (replicateM, (<=<))
 import qualified Control.Monad.State as S
-import           Control.Monad (replicateM, (<=<))
-import qualified Data.Map.Strict as M
-import Data.Semigroup (Semigroup, (<>))
-import Data.Maybe (maybe)
-import Data.Monoid (Sum (Sum), Product (Product))
-import Data.Validation (AccValidation (AccSuccess, AccFailure))
-import Text.Read (readMaybe)
+import qualified Data.Map.Strict     as M
+import           Data.Maybe          (maybe)
+import           Data.Monoid         (Product (Product), Sum (Sum))
+import           Data.Semigroup      (Semigroup, (<>))
+import           Data.Validation     (AccValidation, AccValidation (AccFailure, AccSuccess))
+import           Text.Read           (readMaybe)
 
 goodMap :: M.Map String Int
 goodMap = M.fromList [("a", 1), ("b", 3), ("c", 5)]
@@ -24,16 +24,41 @@ addThreeMaybes m =
          (M.lookup "b" m)
          (M.lookup "c" m)
 
-addThreeMaybesL h =
-  fmap sum . traverse (`M.lookup` h) $ ["foo", "bar", "baz"]
+addMaybes :: M.Map String Int -> [String] -> Maybe Int
+addMaybes h keys =
+  fmap sum . traverse (`M.lookup` h) $ keys
 
-addThreeValidations h keys =
+addValidations :: M.Map String Int -> [String] -> AccValidation [String] Int
+addValidations h keys =
   let
     f k = maybe (AccFailure $ ["Couldn't find key: " <> k])
                 AccSuccess
                 (M.lookup k h)
   in
     fmap sum . traverse f $ keys
+
+-- validatedLookup :: Num a
+--                 => M.Map String a
+--                 -> String
+--                 -> AccValidation [String] a
+validatedLookup h k =
+  maybe (AccFailure $ ["Couldn't find key: " <> k])
+        AccSuccess
+        (M.lookup k h)
+
+-- addThings ::
+--   ( Num n
+--   , Applicative f
+--   , Traversable t
+--   )
+--   => (k -> f n)
+--   -> t k
+--   -> f n
+addThings f as =
+  fmap sum . traverse f $ as
+
+addMultiplesOf n ms =
+  addThings (*) ms n
 
 addThreeDependentFailures :: M.Map String (String, Int) -> Maybe Int
 addThreeDependentFailures m =
