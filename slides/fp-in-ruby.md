@@ -170,8 +170,15 @@ nums = []
 # Good
 nums = (1..10).select { |n| n.even? }
 
+# Best
+nums = (1..10).select(&:even?)
+
 # => [2,4,6,8,10]
 ```
+
+<div class="notes"
+`filter` in other langs
+</div>
 
 ##
 
