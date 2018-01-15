@@ -6,6 +6,10 @@
 
 ## Higher order functions
 
+<div class="notes"
+Starting here because later concepts depend on this
+</div>
+
 ##
 
 Higher order functions are essential to FP. Ruby doesn't quite support them, but we can approximate them with blocks/`Proc`.
@@ -111,6 +115,7 @@ b = map_proc(a, f)
 ## Referential transparency
 
 - Immutability
+- No free variables
 - No side effects
 
 ##
@@ -127,7 +132,7 @@ things.map! { |s| s.upcase }
 things2 = ['keyboard', 'mouse', 'display']
 up_things2 = things.map { |s| s.upcase }
 # things2 == ['keyboard', 'mouse', 'display']
-# up_things == ['KEYBOARD', 'MOUSE', 'DISPLAY']
+# up_things2 == ['KEYBOARD', 'MOUSE', 'DISPLAY']
 ```
 
 <div class="notes">
@@ -140,7 +145,7 @@ up_things2 = things.map { |s| s.upcase }
 
 ##
 
-Avoid `each` and `for` loops - they suggest side effects. Instead use functions like:
+Avoid `each` and `for` loops. Instead use functions like:
 
  - `select`
  - `map`
@@ -148,6 +153,7 @@ Avoid `each` and `for` loops - they suggest side effects. Instead use functions 
  - `zip`
 
 <div class="notes">
+- `each` and `for` suggest side effects
 - Each of these are higher order functions in the sense that they expect a block
 - Check the `Array` and `Enumerator` interfaces for more
 </div>

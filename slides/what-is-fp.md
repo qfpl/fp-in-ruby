@@ -1,12 +1,5 @@
 # What is FP?
 
-## {data-background-image="images/monadtshirt.jpg"}
-
-<div class="notes"
-- Lots of myths and misconceptions around FP
-- Different definitions - will give you mine
-</div>
-
 ##
 
 It's programming with functions
@@ -37,9 +30,13 @@ Mapping of inputs to outputs
  - Purity / referential transparency
  - Types
  
+<div class="notes"
+- Consequences of mathematical function
+</div>
+
 ## Purity
 
-- No observable side effects
+- No _observable_ side effects
 - No free variables
 
 <div class="notes">
@@ -51,16 +48,33 @@ Mapping of inputs to outputs
 ##
 
 ```ruby
+# impure
 def foo(a)
   b = a ** 2
   (a + b) * @factor
 end
+
+# pure
+def bar(a, factor)
+  b = a ** 2
+  (a + b) * factor
+end
 ```
+
+<div class="notes"
+`foo` is impure because it uses a free variable
+</div>
 
 ## Referential transparency
 
 > Replacing any call to a function with the function's return value results in a program with
 > identical behavior.
+
+<div class="notes"
+- Related to purity
+- Greatly enhances ability to reason about code
+- Greatly reduces risk of change - e.g. extracting function
+</div>
 
 ##
 
@@ -85,6 +99,11 @@ def lyf
   2 * 21
 end
 ```
+
+<div class="notes"
+- Replaced call to `add` in `lyf` with result of call.
+- This is safe because `add` is referentially transparent
+</div>
 
 ##
 
@@ -111,9 +130,8 @@ end
 
 ```ruby
 def order(items, credit_card)
-  total_cost = 0
-  for i in items
-    total_cost += i.quantity * i.unit_price
+  total_cost = items.inject(0) do |s, i|
+    s + i.quantity * i.unit_price
   end
 
   # Actually charges the card
@@ -123,34 +141,11 @@ end
 ```
 
 <div class="notes">
-- Let's look at a less trivial example
-- Want to ensure you don't create an order without it getting paid for
-- I can't get an order without charging a card - coupling
-- More importantly, I can't replace the call to `order` with the returned `Order` and
-  have my software work the same way
-</div>
-
-##
-
-```ruby
-def order(items, credit_card)
-  total_cost = 0
-  for i in items
-    total_cost += i.quantity * i.unit_price
-  end
-
-  charge = Charge.new(credit_card, total_cost)
-  Order.new(items, total_cost, charge)
-end
-```
-
-<div class="notes">
-- This _is_ referentially transparent
-- Anywhere I see a call to `order`, I can replace it with the resulting `Order`
-  and my program behaves exactly the same
-- Idea that you can turn your effects into data and run them explicitly
-- Furthermore, the code that runs effects can be tested more easily now - just
-  fire data structures at the method
+- `order` is not referentially transparent
+   + calls `charge`, which we're assuming charges the card
+   + definitely can't replace calls to `order` with the returned `Order`
+- I can't get an order without charging a card
+   + Creation of an order is tied to effect of charging the card
 </div>
 
 ##
@@ -165,6 +160,13 @@ def order(items, credit_card)
   Order.new(items, total_cost, charge)
 end
 ```
+
+<div class="notes">
+- This _is_ referentially transparent
+- Idea that you can turn your effects into data and run them explicitly
+- We've also decoupled creation of data and running of effects
+   + Simpler design and easier to test
+</div>
 
 ##
 
@@ -188,18 +190,31 @@ Why is referential transparency desirable?
 
 What am I giving up with referential transparency?
 
+- Mutation
+- Free variables
+
 ##
 
-- No writes to the database
-- No printing to the console
-- No mutable state
+What am I not giving up?
+
+- Interacting with the outside world
 
 <div class="notes">
-- Some people might think I'm crazy
+- Still do things like
+   + Write to the DB
+   + Print to the console
+   + Read a file
+   + Generate random numbers
 - People write software this way to do everything you do in Ruby
+- Web apps, transport models, vector tile server, games
 </div>
 
 ## {data-background-image="images/one-weird-trick.jpg" data-background-size="contain"}
+
+<div class="notes"
+At this point might think I'm crazy for claiming you can maintain
+RT and do more than heat your CPU
+</div>
 
 ##
 
@@ -208,37 +223,54 @@ values that are executed by a runtime system.
 
 ##
 
-```haskell
-main :: IO ()
-```
-
-<div class="notes">
-- `main` is the entrypoint to a Haskell program, similar to C
-- It always has type `IO ()`
-- This means it returns a computation (value!) that performs some IO (side effects) and yields no value
-- The computation is a value that Haskell's runtime system can execute
-</div>
-
-##
-
 ```ruby
-def main(num_echoes)
+def main(args)
   <<-MAIN
+  num_echoes = #{args[0]}
   loop do
     s = $stdin.gets
-    break if s.chomp == 'quit'
-    puts(s * #{num_echoes})
+    break if s.chomp == 'q'
+    puts(s * num_echoes)
   end
   MAIN
 end
 
-# Pretend runtime system
-eval(main(ARGV[0]))
+eval(main(ARGV))
 ```
 
 <div class="notes">
+- Echo program
+   + Reads number from command line
+   + Echos input lines the specified number of time
 - This is very roughly analogous to what Haskell does
-- We have a pure function that returns a computation (`String`), and the runtime system executes it
+- We have a pure function that returns a computation (`String`)
+- Computation is evaluated separately (`eval` in this case)
+- Please DO NOT do this - just illustrating the point
+</div>
+
+##
+
+```haskell
+main = do
+  args <- getArgs
+  let
+    e s =
+      error $ "Unable to parse '" ++ s ++ "' as Int"
+    go' =
+      case args of
+        (s:_) -> either (const (e s)) go $ readEither s
+        _     -> error "Expected at least one arg"
+    go _ "q" = pure ()
+    go n s   = do
+      (() <$) . replicateM n . putStrLn $ s
+      getLine >>= go n
+  getLine >>= go'
+```
+
+<div class="notes">
+- This code is pure and referentially transparent
+- Returns a computation (value!) that is able to instruct a runtime system
+  on what to do
 </div>
 
 ##
@@ -252,6 +284,11 @@ What are the downsides of referential transparency?
 
 ## Types
 
+<div class="notes"
+If we're basing our definition of a function on mathematics,
+then types are required for FP.
+</div>
+
 ##
 
 <img src="images/function.png" width="60%" />
@@ -259,13 +296,18 @@ What are the downsides of referential transparency?
 <div class="notes">
 - Notice that our function is defined as being between two sets
 - X is a set of coloured shapes, and Y is a set of colours
-- types categorises values in the same way that set membership does
-- Only defined for inputs in X - no need to worry about other inputs
+- set membership categorises values and determines valid inputs and outputs
+  to our function (domain and codomain/range)
+- Types in programming languages do the same job
 </div>
 
 ##
 
 Why are types desirable?
+
+<div class="notes"
+Not only required by mathematical definition - have benefits
+</div>
 
 ##
 
@@ -284,53 +326,56 @@ Why are types desirable?
 
 ##
 
+```haskell
+data Vehicle = Car
+             | Bicycle
+             | MotorBike
+             
+describeVehicle :: Vehicle -> String
+describeVehicle Car =
+  "Closed in people container on 3 or more wheels"
+describeVehicle Bicycle =
+  "Person powers two wheels with pedals"
+describeVehicle MotorBike =
+  "Two wheels powered by a motor"
+```
+
+<div class="notes"
+Defined a sum type and pattern matched it in a function
+
+ - Sum type is closed
+ - Compiler can tell us if we've forgotten to handle a case
+ - Compiler will fail if we include a case not in the type
+</div>
+
+##
+
 Why are types _not_ desirable?
 
 ##
 
-- When they're not expressive enough
-- When tool support is lacking
+- Types not expressive enough
+- Tool support is lacking
+- Cumbersome to use
+- Bad error messages
 
 <div class="notes">
-- In theory there's a tradeoff, although personally I would always prefer a type system
-</div>
-
-##
-
-"I've used language X and the types got in the way more than they helped"
-
-<div class="notes">
+- In short - when the type system isn't good enough
+- More conventional languages with static types poisoned the well a bit
 - I felt this way too after using conventional, typed, OO languages
 - Much better tools exist
-   + Haskell
-   + Idris
-   + Agda
 - Encourage you to try these if you have this opinion
-</div>
-
-##
-
- - Robust and widespread inference
- - Algebraic data types (sums and products)
-
-<div class="notes">
-- many Ruby expressions are valid Haskell programs thanks to inference
-- Powerful and concise declarations
 </div>
 
 ## Functions are values
 
-<div class="notes">
-- Another property of FP not implied by our definition
-</div>
-
 ##
 
-Functions are values, just like strings and numbers, that can be passed to other functions as arguments or returned by functions.
+Functions, just like strings and numbers, are values that can be passed to other functions as arguments or returned by functions.
 
 <div class="notes">
-- lambdas/procs/blocks in Ruby
 - functions that take/return functions are _higher order_
+- lambdas/procs/blocks in Ruby
 </div>
 
 ## Abstraction
@@ -340,5 +385,6 @@ Functions are values, just like strings and numbers, that can be passed to other
 - Recognize patterns and factor them out.
 - Common language for concepts
 - _not_ about being obtuse and academic
+- Steal from mathematics research
 </div>
 
