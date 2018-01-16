@@ -112,7 +112,7 @@ b = map_proc(a, f)
 - `#to_proc` on symbols returns a `Proc` that executes the named _instance_ method
 - `Proc` argument is taken as a block
 
-## Referential transparency
+## Purity / referential transparency
 
 - Immutability
 - No free variables
@@ -137,9 +137,6 @@ up_things2 = things.map { |s| s.upcase }
 
 <div class="notes">
 - Can always replace mutation with another variable
-- Mutation is a problem because it hurts our ability to reason
-   + Must interpret the code in your head to know what a variable contains at any point
-   + With immutability, you only need to find where it's defined - can't be anything else after that
 - Tradeoff is coming up with more names for things
 </div>
 
@@ -153,7 +150,7 @@ Avoid `each` and `for` loops. Instead use functions like:
  - `zip`
 
 <div class="notes">
-- `each` and `for` suggest side effects
+- `each` and `for` suggest side effects - no return values
 - Each of these are higher order functions in the sense that they expect a block
 - Check the `Array` and `Enumerator` interfaces for more
 </div>
@@ -163,11 +160,10 @@ Avoid `each` and `for` loops. Instead use functions like:
 ### `select`
 
 ```ruby
-# Bad
 nums = []
 (1..10).each { |n| nums << n if n.even? }
 
-# Good
+# Better
 nums = (1..10).select { |n| n.even? }
 
 # Best
@@ -185,12 +181,11 @@ nums = (1..10).select(&:even?)
 ### `map`
 
 ```ruby
-# Bad
 nums = [1,2,3]
 squares = []
 nums.each { |n| squares << n ** 2 }
 
-# Good
+# Better
 squares = nums.map { |n| n ** 2 }
 
 # => [1,4,9]
@@ -218,6 +213,11 @@ nums.inject(0) { |sum, n| sum + n }
 # Best
 nums.inject(0, &:+)
 ```
+
+<div class="notes">
+- `inject` is `fold` or `reduce` in other langs
+- often about summarising/collapsing/aggregating a collection
+</div>
 
 ##
 
@@ -257,6 +257,7 @@ end
 ```ruby
 odds = [1,3]
 evens = [2,4]
+
 pairs = []
 (0..[odds.length, evens.length].min).each { |i|
   pairs << [odds[i], evens[i]]
@@ -265,7 +266,41 @@ pairs = []
 
 zip_pairs = odds.zip(evens)
 # zip_pairs == [[1,2], [3,4]]
+```
 
+##
+
+```ruby
+odds = [1,3,5]
+evens = [2,4,6]
+
+foo = odds.zip(evens) { |(a,b)| a * b }
+```
+
+<div class="notes">
+`zip` can also take a block to produce a value from each array of zipped together values
+</div>
+
+## {data-background-image="images/its-a-trap.jpg" data-background-size="contain"}
+
+## `foo == nil`!!!
+
+```ruby
+odds = [1,3,5]
+evens = [2,4,6]
+
+foo = odds.zip(evens) { |(a,b)| a * b }
+```
+
+##
+
+```ruby
+odds = [1,3,5]
+evens = [2,4,6]
+
+foo = []
+odds.zip(evens) { |(a,b)| foo << a * b }
+# foo == [2,12,30]
 ```
 
 ## `self` methods
