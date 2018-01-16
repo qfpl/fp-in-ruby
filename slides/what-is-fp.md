@@ -180,10 +180,10 @@ Why is referential transparency desirable?
 
 <div class="notes">
 - Each function/method is entirely self contained
-  + Never have to worry about state of the system
-  + Who's pretended to be an interpreter and maintained state in their head to understand code?
-- Testing doesn't require mocks/stubs. Pass arguments to a function and compare the results
-  + At some point you want to test the whole system, but almost all code should be pure and rt
+    + local reasoning
+    + Never have to worry about state of the system
+    + No pretending to be an interpreter/compiler
+- Testing is simply passing arguments to functions and comparing the result
 </div>
 
 ##
@@ -192,12 +192,21 @@ What am I giving up with referential transparency?
 
 - Mutation
 - Free variables
+- Familiarity
+- Byzantine system states
+
+<div class="notes">
+- Mutation and free variables are usually a bad idea anyway
+- Familiarity is just time and practice - remember when you didn't know how to for loop?
+</div>
 
 ##
 
 What am I not giving up?
 
-- Interacting with the outside world
+- State
+- IO
+- Anything you need to write great software
 
 <div class="notes">
 - Still do things like
@@ -220,6 +229,10 @@ RT and do more than heat your CPU
 
 Our programs don't execute side effects, they produce computations as pure
 values that are executed by a runtime system.
+
+<div class="notes">
+- Monadic state and IO
+</div>
 
 ##
 
@@ -285,20 +298,9 @@ What are the downsides of referential transparency?
 ## Types
 
 <div class="notes"
-If we're basing our definition of a function on mathematics,
-then types are required for FP.
-</div>
-
-##
-
-<img src="images/function.png" width="60%" />
-
-<div class="notes">
-- Notice that our function is defined as being between two sets
-- X is a set of coloured shapes, and Y is a set of colours
-- set membership categorises values and determines valid inputs and outputs
-  to our function (domain and codomain/range)
-- Types in programming languages do the same job
+- Not required by definition, but overlaps with notion of sets
+- I find them incredibly useful and so include them when I think
+  about FP
 </div>
 
 ##
