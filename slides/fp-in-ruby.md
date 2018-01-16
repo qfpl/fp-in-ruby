@@ -315,6 +315,10 @@ class Foo
 end
 ```
 
+<div class="notes">
+`self` methods help to enforce referential transparency
+</div>
+
 ## Modules
 
 ```ruby
@@ -332,7 +336,7 @@ end
 <div class="notes">
 - Modules cannot be instantiated
 - Encapsulate data and functions, but no mutable state or inheritance
-- Just data and functions
+- Closer to FP - just data and functions
 </div>
 
 ## Types
@@ -344,19 +348,61 @@ end
 - Can at least make things clearer
 </div>
 
-### Simple data types
+## `Struct`
 
 ```ruby
 Foo = Struct.new(:bar, :baz, :whoozitz)
+
+foo = Foo.new(1,2,3)
+
+# => true
+foo.bar + foo.baz == foo.whoozitz
+
+# => Error!
+foo.quux.nil?
 ```
 
 <div class="notes">
-- Sometimes you want organised data without operations
-- Hash is obvious choice
-- hashes are open - problematic
+- `Struct` is good for data types with known fields
+- `Hash` is problematic because it is open - `Struct` is closed
 </div>
 
 ##
 
-That's it for types
+```ruby
+Foo = Struct.new(:bar, :baz) do
+  def with_bar(bar)
+    self.new(bar, self.baz)
+  end
+  
+  def total
+    self.bar + self.baz
+  end
+end
+```
+
+<div class="notes">
+- `Struct` can also contain methods
+- Not that close to FP, but closer to idiomatic Ruby
+- Can use methods to provide convenient, immutable operations
+</div>
+
+## {data-background-image="images/functional-core.png" data-background-size="contain"}
+
+<div class="notes">
+In addition to the smaller scale stuff, there's a big picture idea
+that was popularised about 5 years ago.
+
+May also hear IO or effects at the edges - very common in Haskell/FP world
+
+Talk given by Gary Bernhardt
+</div>
+
+##
+
+- Any effects/IO at boundaries of application
+- Bring things in to application's data structures
+- Validate aggressively before core of app uses data
+- Write pure transformations on those data structures
+- Turn data structures into effects as late as possible
 

@@ -6,21 +6,24 @@ Put this in its own section, because it is a big one
 
 ##
 
-Mathematics has a rich world of algebra that is hard to take advantage of without a good type system.
-
-##
+Mathematics has a rich language for abstractions that we can steal.
 
 - `Monoid`
 - `Functor`
 - `Applicative`
 - `Monad`
 
+<div class="notes">
+- These words might seem strange
+- Don't use them to obfuscate or exclude
+- Precise meanings - safer to not use analogies or overloaded terms
+</div>
+
 ## Optional data
 
 ##
 
 ```haskell
-addThreeMaybes :: Map String Int -> Int
 addThreeMaybes h =
   liftA3 (\a b c -> a + b + c)
          (lookup h "foo")
@@ -31,19 +34,19 @@ addThreeMaybes h =
 <div class="notes">
 Things to note:
 
+- uses idea of an `Applicative`
 - no mention of failure/nil/Nothing values
 - only contains things unique to our problem:
    + `liftA3` to run the computation
    + lambda to specify what to do with each value
    + each of the values
-- side note on Haskell - the type declaration isn't necessary here
+- no type signature - inference is great
 </div>
 
 ##
 
 ```haskell
 -- List of keys can be arbitrarily long. If any aren't present, we get `Nothing`.
-addThreeMaybes :: Map String Int -> [String] -> Int
 addThreeMaybes h keys =
   fmap sum . traverse (`M.lookup` h) $ keys
 ```
@@ -109,7 +112,7 @@ end
 ```
 
 <div class="notes">
-Similar to the haskell version, but not as nice
+Closer to the Haskell in structure, but still explicitly handling nil.
 </div>
 
 ##
