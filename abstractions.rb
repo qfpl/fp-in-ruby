@@ -8,6 +8,30 @@ module Abstractions
   HDEPS = {"a" => ["b", 1], "b" => ["c", 3], "c" => ["d", 5]}
   HDEPS_BOOM = {"a" => ["b", 1], "b" => ["c", "oops"], "c" => ["d", 5]}
 
+  def self.add_things(fmap, pure, lifta2, f, keys)
+    fas = keys.inject(pure.call([])) { |fas, k|
+      fa = f.call(k)
+      lifta2.call(fa, fas) { |a, as| as << a }
+    }
+
+    fmap.call(fas) { |as| as.inject(0, &:+) }
+  end
+
+  def self.add_things_nil
+    pyooah = Optional.method(:new)
+    fmap = ->(o, &f){ pyooah.call(f.call(o.value)) }
+    lifta2 = ->(fa, fb, &fg){
+      fg.and_then { |g| }
+    }
+    #pyooah = ->(a){a.nil? ? Many.new([]) : Many.new([a])}
+    abstract_deps(pyooah,
+                  ->(a,b){a + b},
+                  0,
+                  ->(k){pyooah.call(HDEPS[k])},
+                  "a"
+                 )
+  end
+
   def self.add_three_failures(h)
     a = h["a"]
     b = h["b"]

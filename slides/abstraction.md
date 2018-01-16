@@ -6,7 +6,7 @@ Put this in its own section, because it is a big one
 
 ##
 
-Mathematics has a rich language for abstractions that we can steal.
+Mathematics has a rich language for abstractions that we can steal from.
 
 - `Monoid`
 - `Functor`
@@ -46,7 +46,8 @@ Things to note:
 ##
 
 ```haskell
--- List of keys can be arbitrarily long. If any aren't present, we get `Nothing`.
+-- List of keys can be arbitrarily long.
+-- If any aren't present, we get `Nothing`.
 addThreeMaybes h keys =
   fmap sum . traverse (`M.lookup` h) $ keys
 ```
@@ -137,7 +138,9 @@ addThreeValidations h keys =
     
 -- "foo" and "baz" aren't keys in the map
 addThreeValidations someMap ["foo", "bar", "baz"]
--- => AccFailure ["Couldn't find key: foo","Couldn't find key: baz"]
+-- => AccFailure [ "Couldn't find key: foo",
+--               , "Couldn't find key: baz"
+--               ]
 ```
 
 <div class="notes">
@@ -148,21 +151,19 @@ errors and aggregates them.
 ##
 
 ```haskell
--- Maybe
-addThreeMaybes :: 
-addThreeMaybes =
+addMaybes h keys =
   let
     f = (`M.lookup` h)
   in
     fmap sum . traverse f $ keys
 
--- Validation
-let
-  f k = maybe (AccFailure $ ["Couldn't find key: " <> k])
-              AccSuccess
-              (M.lookup k h)
-in
-  fmap sum . traverse f $ keys
+addValidation h keys =
+  let
+    f k = maybe (AccFailure $ ["Couldn't find key: " <> k])
+                AccSuccess
+                (M.lookup k h)
+  in
+    fmap sum . traverse f $ keys
 ```
 
 ##
@@ -170,11 +171,20 @@ in
 ```haskell
 addThings f xs =
   fmap sum . traverse f $ xs
-  
+```
+
+<div class="notes">
+- Factored repetition and separated concerns
+- Function about adding things in some computational context
+   + missing data, failure with record, computations that require an input
+</div>
+
+##
+
+```haskell
 addMaybes h keys =
   addThings (`M.lookup` h) keys
   
-
 addValidations h keys =
   let
     validatedLookup k =
@@ -183,16 +193,17 @@ addValidations h keys =
             (M.lookup k h)
   in
     addThings validatedLookup keys
-  
+```
+ 
+##
+ 
+```haskell
 addMultiplesOf n ns =
   addThings (*) ns n
+  
+-- > addMultiplesOf 5 [1,2,3]
+-- 30
 ```
-
-<div class="notes">
-- Factored repetition and separated concerns
-- Function about adding things in some computational context
-   + missing data, failure with record, computations that require an input
-</div>
 
 ##
 
