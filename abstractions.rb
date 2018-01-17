@@ -5,6 +5,7 @@ include Monads
 
 module Abstractions
 
+  HNUMS = {"a" => 1, "b" => 3, "c" => 5}
   HDEPS = {"a" => ["b", 1], "b" => ["c", 3], "c" => ["d", 5]}
   HDEPS_BOOM = {"a" => ["b", 1], "b" => ["c", "oops"], "c" => ["d", 5]}
 
@@ -17,19 +18,22 @@ module Abstractions
     fmap.call(fas) { |as| as.inject(0, &:+) }
   end
 
-  def self.add_things_nil
+  def self.add_things_nil(h, keys)
     pyooah = Optional.method(:new)
-    fmap = ->(o, &f){ pyooah.call(f.call(o.value)) }
-    lifta2 = ->(fa, fb, &fg){
-      fg.and_then { |g| }
+    fmap = ->(o, &f){ pyooah.call(o.and_then { |x| f.call(x) }) }
+    lifta2 = ->(fa, fb, &g){
+      fa.and_then { |a|
+        fb.and_then { |b|
+          pyooah.call(g.call(a, b))
+        }
+      }
     }
-    #pyooah = ->(a){a.nil? ? Many.new([]) : Many.new([a])}
-    abstract_deps(pyooah,
-                  ->(a,b){a + b},
-                  0,
-                  ->(k){pyooah.call(HDEPS[k])},
-                  "a"
-                 )
+    add_things(fmap,
+               pyooah,
+               lifta2,
+               ->(k){pyooah.call(h[k])},
+               keys
+               )
   end
 
   def self.add_three_failures(h)
