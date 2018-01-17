@@ -9,8 +9,8 @@ module Abstractions
   HDEPS = {"a" => ["b", 1], "b" => ["c", 3], "c" => ["d", 5]}
   HDEPS_BOOM = {"a" => ["b", 1], "b" => ["c", "oops"], "c" => ["d", 5]}
 
-  def self.add_things(fmap, pure, lifta2, f, keys)
-    fas = keys.inject(pure.call([])) { |fas, k|
+  def self.add_things(fmap, pure, lifta2, f, xs)
+    fas = xs.inject(pure.call([])) { |fas, k|
       fa = f.call(k)
       lifta2.call(fa, fas) { |a, as| as << a }
     }
@@ -19,21 +19,15 @@ module Abstractions
   end
 
   def self.add_things_nil(h, keys)
-    pyooah = Optional.method(:new)
-    fmap = ->(o, &f){ pyooah.call(o.and_then { |x| f.call(x) }) }
+    pure = Optional.method(:new)
+    fmap = ->(o, &f){
+      o.and_then { |x| pure.call(f.call(x)) }}
     lifta2 = ->(fa, fb, &g){
       fa.and_then { |a|
         fb.and_then { |b|
-          pyooah.call(g.call(a, b))
-        }
-      }
-    }
-    add_things(fmap,
-               pyooah,
-               lifta2,
-               ->(k){pyooah.call(h[k])},
-               keys
-               )
+          pure.call(g.call(a, b))}}}
+    f = ->(k){pure.call(h[k])}
+    add_things(fmap, pure, lifta2, f, keys)
   end
 
   def self.add_three_failures(h)

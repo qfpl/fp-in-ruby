@@ -207,31 +207,41 @@ addMultiplesOf n ns =
 
 ##
 
-At this point, trying to write `addThings` in Ruby hurt my brain.
+```ruby
+def self.add_things(fmap, pure, lifta2, f, keys)
+  fas = keys.inject(pure.call([])) { |fas, k|
+    fa = f.call(k)
+    lifta2.call(fa, fas) { |a, as| as << a }
+  }
+
+  fmap.call(fas) { |as| as.inject(0, &:+) }
+end
+```
+
+<div class="notes">
+- Have to pass in a bunch of extra functions that are defined for us in Haskell
+- Could put these in a library
+</div>
 
 ##
 
-- No types to guide me or tell me when I'm wrong
+```ruby
+def self.add_things_nil(h, keys)
+  pure = Optional.method(:new)
+  fmap = ->(o, &f){
+    o.and_then { |x| pure.call(f.call(x)) }}
+  lifta2 = ->(fa, fb, &g){
+    fa.and_then { |a|
+      fb.and_then { |b|
+        pure.call(g.call(a, b))}}}
+  f = ->(k){pure.call(h[k])}
+  add_things(fmap, pure, lifta2, f, keys)
+end
+```
+
+##
+
+- No types or compiler to guide me or tell me when I'm wrong
 - No existing abstractions to build on
-
-## Take away
-
-- Ruby gives you some basics
-   + Methods that don't use mutation
-   + Higher order functions via blocks/`Proc`
-- Ruby falls down with deeper abstractions
-   + Lack of types/tool suppport
-   + Fighting the design/intentions of the language
-   
-<div class="notes">
-- Using what you can will make your code better
-- You'll hit a limit fairly quickly
-   + Ability to keep everything in your head starts to break down
-   + This is where tools/types help
-- This _does_ matter. Ability to abstract further means...
-   + less repetition
-   + less bugs
-   + shared understanding and code
-   + steal from mathematicians
-</div>
+- Struggling against the language and all other Ruby libs
 
