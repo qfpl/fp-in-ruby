@@ -110,7 +110,6 @@ b = map_proc(a, f)
 
 - `&` prefix calls `#to_proc`
 - `#to_proc` on symbols returns a `Proc` that executes the named _instance_ method
-- `Proc` argument is taken as a block
 
 ## Purity / referential transparency
 
@@ -319,35 +318,6 @@ end
 `self` methods help to enforce referential transparency
 </div>
 
-## Modules
-
-```ruby
-module TicTacToe
-  Game = Struct.new(:board, :next_symbol, :winner)
-  
-  def self.finished?(game)
-    return true unless game.winner.nil?
-    return true if board_full?(game.board)
-    false
-  end
-end
-```
-
-<div class="notes">
-- Modules cannot be instantiated
-- Encapsulate data and functions, but no mutable state or inheritance
-- Closer to FP - just data and functions
-</div>
-
-## Types
-
-<div class="notes">
-- Ruby is unityped
-- No compiler support
-- Can't do a lot
-- Can at least make things clearer
-</div>
-
 ## `Struct`
 
 ```ruby
@@ -386,6 +356,38 @@ end
 - Not that close to FP, but closer to idiomatic Ruby
 - Can use methods to provide convenient, immutable operations
 </div>
+
+## Modules
+
+```ruby
+module TicTacToe
+  Game = Struct.new(:board, :next_symbol, :winner)
+  
+  def self.finished?(game)
+    !game.winner.nil? || board_full?(game.board)
+  end
+
+  def self.with_winner(game, winner)
+    self.new(game.board, game.next_symbol, winner)
+  end
+end
+```
+
+<div class="notes">
+- Modules cannot be instantiated
+- Encapsulate data and functions, but no mutable state or inheritance
+- Set fields by returning a new instance of the data type
+</div>
+
+## Types
+
+<div class="notes">
+- Ruby is unityped
+- No compiler support
+- Can't do a lot
+- Can at least make things clearer
+</div>
+
 
 ## {data-background-image="images/functional-core.png" data-background-size="contain"}
 
