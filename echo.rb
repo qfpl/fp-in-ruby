@@ -11,7 +11,7 @@ def main(args)
   MAIN
 end
 
-eval(main(ARGV))
+# eval(main(ARGV))
 
 def map_block(a)
   b = []
@@ -44,4 +44,17 @@ end
 def foo
   f = Proc.new { |n| n * 2 }
   map_block([1,2,3], &f)
+end
+
+def describe_vehicle(v)
+  case v
+  when :car
+    "Closed in people container on 3 or more wheels"
+  when :bicycle
+    "Person powers two wheels with pedals"
+  when :motorbike
+    "Two wheels powered by a motor"
+  else
+    raise "I don't know how to describe a '#{v}'"
+  end
 end

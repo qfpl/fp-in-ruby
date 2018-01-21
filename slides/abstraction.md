@@ -169,6 +169,24 @@ addValidation h keys =
 ##
 
 ```haskell
+                  
+     
+                      
+    
+    fmap sum . traverse f $ keys
+
+                      
+     
+                                                           
+                          
+                              
+    
+    fmap sum . traverse f $ keys
+```
+
+##
+
+```haskell
 addThings f xs =
   fmap sum . traverse f $ xs
 ```

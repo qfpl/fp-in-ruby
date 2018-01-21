@@ -27,8 +27,7 @@ Mapping of inputs to outputs
 
 ##
 
- - Purity / referential transparency
- - Types
+Purity / referential transparency
  
 <div class="notes"
 - Consequences of mathematical function
@@ -120,52 +119,7 @@ end
 ```
 
 <div class="notes">
-- `add` is impure because it references an instance variable and prints
-- `add` isn't referentially transparent because its return value may change without inputs changing
-   + instance variable could change
-- `add` has side effects - output not printed if replace call
-</div>
-
-##
-
-```ruby
-def order(items, credit_card)
-  total_cost = items.inject(0) do |s, i|
-    s + i.quantity * i.unit_price
-  end
-
-  # Actually charges the card
-  charge(credit_card, total_cost)
-  Order.new(items, total_cost)
-end
-```
-
-<div class="notes">
-- `order` is not referentially transparent
-   + calls `charge`, which we're assuming charges the card
-   + definitely can't replace calls to `order` with the returned `Order`
-- I can't get an order without charging a card
-   + Creation of an order is tied to effect of charging the card
-</div>
-
-##
-
-```ruby
-def order(items, credit_card)
-  total_cost = items.inject(0) do |s, i|
-    s + i.quantity * i.unit_price
-  end
-
-  charge = Charge.new(credit_card, total_cost)
-  Order.new(items, total_cost, charge)
-end
-```
-
-<div class="notes">
-- This _is_ referentially transparent
-- Idea that you can turn your effects into data and run them explicitly
-- We've also decoupled creation of data and running of effects
-   + Simpler design and easier to test
+- instance variable and printing - can't replace call
 </div>
 
 ##
@@ -193,7 +147,6 @@ What am I giving up with referential transparency?
 - Mutation
 - Free variables
 - Familiarity
-- Byzantine system states
 
 <div class="notes">
 - Mutation and free variables are usually a bad idea anyway
@@ -252,11 +205,9 @@ eval(main(ARGV))
 ```
 
 <div class="notes">
-- Echo program
-   + Reads number from command line
-   + Echos input lines the specified number of time
 - This is very roughly analogous to what Haskell does
 - We have a pure function that returns a computation (`String`)
+- Computation is impure when evaluated - but the value representing the computation is pure
 - Computation is evaluated separately (`eval` in this case)
 - Please DO NOT do this - just illustrating the point
 </div>
@@ -282,48 +233,32 @@ main = do
 
 <div class="notes">
 - This code is pure and referentially transparent
-- Returns a computation (value!) that is able to instruct a runtime system
-  on what to do
+- Returns a value representing an impure computation
 </div>
-
-##
-
-What are the downsides of referential transparency?
-
-##
-
-- Some algorithms may require mutation to achieve highest performance
-- Hard to achieve in languages where it's not the default
 
 ## Types
 
 <div class="notes"
 - Not required by definition, but overlaps with notion of sets
-- I find them incredibly useful and so include them when I think
-  about FP
+- Sets classify values and make our functions more precise - like types
+- Think they're a very important tool in producing robust software
 </div>
 
 ##
 
 Why are types desirable?
 
-<div class="notes"
-Not only required by mathematical definition - have benefits
-</div>
-
 ##
 
 - Allow you to more precisely represent the intentions of the programmer
-- Catches many errors before runtime
-- Eliminates need for many tests
+- Catch many errors before runtime
+- Eliminate need for many tests
 - Support you in writing complex code
 
 <div class="notes">
-- restricted types with few inhabitants make code easier to reason about
-  + 3 possible inputs vs infinity
-- achieving the same robustness requires a lot of boilerplate in unityped langs
-- compiler error at function call site, vs testing a method handles type errors
-- can make changes and then follow the compiler errors - no misses
+- Communication tool
+- Easier to reason about - closed sums
+- Gives us extra cycles to focus on our problem
 </div>
 
 ##
@@ -352,41 +287,50 @@ Defined a sum type and pattern matched it in a function
 
 ##
 
-Why are types _not_ desirable?
+```ruby
+def describe_vehicle(v)
+  case v
+  when :car
+    "Closed in people container on 3 or more wheels"
+  when :bicycle
+    "Person powers two wheels with pedals"
+  when :motorbike
+    "Two wheels powered by a motor"
+  else
+    raise "I don't know how to describe a '#{v}'"
+  end
+end
+```
+
+<div class="notes">
+`v` could be anything. We're not even sure it's a symbol, let alone a symbol
+from the set of vehicles.
+
+Runtime errors can mean someone gets woken up at night.
+</div>
 
 ##
 
-- Types not expressive enough
-- Tool support is lacking
-- Cumbersome to use
-- Bad error messages
+Types aren't bad - type _systems_ are _sometimes_ bad.
 
 <div class="notes">
-- In short - when the type system isn't good enough
-- More conventional languages with static types poisoned the well a bit
+- Types not expressive enough
+- Compiler/tool support not good
+- Very common, statically typed languages poisoned the well
 - I felt this way too after using conventional, typed, OO languages
-- Much better tools exist
-- Encourage you to try these if you have this opinion
 </div>
 
 ## Functions are values
 
 ##
 
-Functions, just like strings and numbers, are values that can be passed to other functions as arguments or returned by functions.
-
-<div class="notes">
+- functions are _first class_ - can be treated like any other value
 - functions that take/return functions are _higher order_
-- lambdas/procs/blocks in Ruby
-</div>
 
 ## Abstraction
 
 <div class="notes">
 - Finally - mathematics and software both about abstraction.
 - Recognize patterns and factor them out.
-- Common language for concepts
-- _not_ about being obtuse and academic
-- Steal from mathematics research
 </div>
 
