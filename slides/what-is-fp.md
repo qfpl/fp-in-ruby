@@ -91,39 +91,6 @@ end
 - instance variable and printing - can't replace call
 </div>
 
-## Purity
-
-- No _observable_ side effects
-- No free variables
-
-<div class="notes">
-- Free variables are variables that are not local to the function
-   + Not a paramater
-   + Not created within scope of the function
-</div>
-
-##
-
-```ruby
-# impure
-def foo(a)
-  b = a ** 2
-  (a + b) * @factor
-end
-
-# pure
-def bar(a, factor)
-  b = a ** 2
-  (a + b) * factor
-end
-```
-
-<div class="notes"
-`foo` is impure because it uses a free variable
-</div>
-
-##
-
 Why is referential transparency desirable?
 
 ##

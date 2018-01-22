@@ -1,22 +1,9 @@
 # Abstraction
 
 <div class="notes">
-Put this in its own section, because it is a big one
-</div>
-
-##
-
-Mathematics has a rich language for abstractions that we can steal from.
-
-- `Monoid`
-- `Functor`
-- `Applicative`
-- `Monad`
-
-<div class="notes">
-- These words might seem strange
-- Don't use them to obfuscate or exclude
-- Precise meanings - safer to not use analogies or overloaded terms
+- Full benefits of FP require aggressive abstraction
+- Taken from mathematics
+- Want to demonstrate what Ruby can do and what it can't
 </div>
 
 ## Optional data
@@ -239,6 +226,7 @@ end
 <div class="notes">
 - Have to pass in a bunch of extra functions that are defined for us in Haskell
 - Could put these in a library
+- Code was hard to write - got it wrong a few times and not confident there aren't corner cases
 </div>
 
 ##
@@ -257,6 +245,11 @@ def self.add_things_nil(h, keys)
 end
 ```
 
+<div class="notes">
+Have to do a lot of work to call it - no lang/lib support
+
+Again, overly complicated and error prone without tools
+</div>
 ##
 
 - No types or compiler to guide me or tell me when I'm wrong
