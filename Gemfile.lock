@@ -1,0 +1,13 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    monads (0.1.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  monads
+
+BUNDLED WITH
+   1.14.6
