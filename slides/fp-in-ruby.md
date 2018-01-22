@@ -379,16 +379,6 @@ end
 - Set fields by returning a new instance of the data type
 </div>
 
-## Types
-
-<div class="notes">
-- Ruby is unityped
-- No compiler support
-- Can't do a lot
-- Can at least make things clearer
-</div>
-
-
 ## {data-background-image="images/functional-core.png" data-background-size="contain"}
 
 <div class="notes">
