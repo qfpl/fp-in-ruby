@@ -91,6 +91,8 @@ end
 - instance variable and printing - can't replace call
 </div>
 
+##
+
 Why is referential transparency desirable?
 
 ##

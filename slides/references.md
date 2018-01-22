@@ -11,7 +11,6 @@
 
 > - Boundaries talk by Gary Bernhardt: [https://www.youtube.com/watch?v=yTkzNHF6rMs](https://www.youtube.com/watch?v=yTkzNHF6rMs)
 > - `&:` explanation: [https://stackoverflow.com/a/1961118/510722](https://stackoverflow.com/a/1961118/510722)
-> - `monads` library: [https://github.com/tomstuart/monads](https://github.com/tomstuart/monads)
 
 ## This talk
 
