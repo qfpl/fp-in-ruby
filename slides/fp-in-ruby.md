@@ -111,11 +111,15 @@ b = map_proc(a, f)
 - `&` prefix calls `#to_proc`
 - `#to_proc` on symbols returns a `Proc` that executes the named _instance_ method
 
-## Purity / referential transparency
+## Referential transparency / purity
 
 - Immutability
 - No free variables
 - No side effects
+
+<div class="notes">
+Reminder that RT implies these things
+</div>
 
 ##
 
@@ -192,8 +196,6 @@ squares = nums.map { |n| n ** 2 }
 
 <div class="notes">
 - Explicit mutation of `squares` - value change is observable
-- `each` doesn't return values produced in block - suggests there aren't any or
-  that you're building a result through mutation
 </div>
 
 ##
@@ -207,28 +209,16 @@ total = 0
 nums.each { |n| total += n }
 
 # Good
-nums.inject(0) { |sum, n| sum + n }
+total = nums.inject(0) { |sum, n| sum + n }
 
 # Best
-nums.inject(0, &:+)
+total = nums.inject(0, &:+)
 ```
 
 <div class="notes">
 - `inject` is `fold` or `reduce` in other langs
-- often about summarising/collapsing/aggregating a collection
+- accumulates a value using elements in the input
 </div>
-
-##
-
-```ruby
-[1,2,3].inject(0, &:+)
-```
-
-Ruby vs Haskell
-
-```haskell
-foldr (+) 0 [1,2,3]
-```
 
 ##
 
@@ -247,6 +237,7 @@ end
 
 <div class="notes">
 - Sometimes we want to build up a different type of structure and map won't do
+- `inject` isn't about aggretaing/summarising - can accumulate to a new structure
 </div>
 
 ##
