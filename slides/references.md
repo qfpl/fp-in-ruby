@@ -14,6 +14,6 @@
 
 ## This talk
 
-> - Code: [https://github.com/qfpl/fp-and-ruby](https://github.com/qfpl/fp-and-ruby)
-> - Slides: [https://qfpl.io/talks/fp-and-ruby](https://qfpl.io/talks/fp-and-ruby)
+> - Code: [https://github.com/qfpl/fp-in-ruby](https://github.com/qfpl/fp-in-ruby)
+> - Slides: [https://qfpl.io/talks/fp-in-ruby](https://qfpl.io/talks/fp-in-ruby)
 
