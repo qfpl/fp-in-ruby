@@ -8,6 +8,34 @@ module TicTacToe
   SYMBOLS = [:naught, :cross]
 
   Game = Struct.new(:board, :next_symbol, :winner)
+  Either = Struct.new(:error, :value) do
+    def self.succeed(value)
+      self.new(nil, value)
+    end
+
+    def self.fail(error)
+      self.new(error, nil)
+    end
+
+    def self.succeeded?(e)
+      puts e.value.inspect
+      e.error.nil? && !e.value.nil?
+    end
+
+    def self.failed?(e)
+      !succeeded?(e)
+    end
+
+    def self.split_eithers(es)
+      es.inject([[],[]]) { |(ss,fs), e|
+        if Either.succeeded?(e)
+          [ss << e.value, fs]
+        else
+          [ss, fs << e.error]
+        end
+      }
+    end
+  end
 
   def self.start(first_player)
     return nil if !SYMBOLS.include?(first_player)
@@ -51,7 +79,13 @@ module TicTacToe
 
   def self.draw(board)
     bars = '-' * (3 * BOARD_SIZE + (BOARD_SIZE - 1))
-    intercalate(rows(board).map { |r| draw_row(r) }, bars).join("\n")
+    rows_s = rows(board).map { |r| draw_row(r) }
+    (successes, failures) = Either.split_eithers(rows_s)
+    if failures.empty?
+      Either.succeed(intercalate(successes, bars).join("\n"))
+    else
+      Either.fail(failures)
+    end
   end
 
   def self.winner(board)
@@ -69,19 +103,26 @@ module TicTacToe
   end
 
   def self.draw_row(row)
-    ' ' + row.map { |c| "#{draw_symbol(c)}" }.join(' | ')
+    row_s = row.map { |c| "#{draw_symbol(c)}" }
+    failures = row_s.select { |e| Either.failed?(e) }
+    successes = row_s.select { |e| Either.succeeded?(e) }
+    if failures.length > 0
+      failures
+    else
+      ' ' + successes.join(' | ')
+    end
   end
 
   def self.draw_symbol(s)
     case s
     when :empty
-      ' '
+      Either.succeed(' ')
     when :cross
-      'x'
+      Either.succeed('x')
     when :naught
-      'o'
+      Either.succeed('o')
     else
-      raise "Asked to draw invalid symbol #{s.to_s}. This wouldn't happen if we had real sum types"
+      Either.fail("Asked to draw invalid symbol #{s.to_s}.")
     end
   end
 
@@ -108,10 +149,14 @@ puts `clear`
 game = TicTacToe.start(TicTacToe::SYMBOLS.sample)
 error = ""
 until TicTacToe.finished?(game)
+  drawn_game = TicTacToe.draw(game.board)
+  if drawn_game.failed?
+    raise "Drawing the game failed miserably:\n\n#{e.error.inspect}"
+  end
   puts `clear`
   puts error
   puts
-  puts TicTacToe.draw(game.board)
+  puts drawn_game.value
   puts
   puts "It's #{game.next_symbol}'s move."
   puts "move (1-9): "
